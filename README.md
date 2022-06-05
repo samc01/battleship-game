@@ -1,3 +1,3 @@
 # battleship-game
 
-The best battleship game on python!
+My take on a battleship game on Python!
