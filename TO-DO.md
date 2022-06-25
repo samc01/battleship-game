@@ -9,3 +9,6 @@ func position_ship_computer:
 - Falta implementar que para determinar la posicion de la nave no solo se "avance" de cuadrantes desde la 
 posicion inicial.
 - Falta validar que las naves de la computadora no ocupen un mismo cuadrante.
+
+player_shoots:
+- Falta hacer validaciones para cuadrantes a los que se tiene que disparar.
