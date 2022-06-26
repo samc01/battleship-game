@@ -13,11 +13,8 @@ def setup_board(board):
     number = 0
     for lst in board:
         number += 1
-        if number < 9:
-            lst.insert(0, str(number) + " ")
-        else:
-            lst.insert(0, str(number))
-
+        lst.insert(0, str(number) + " ")
+        
     board.append(["  ", " A ", " B ", " C ", " D ", " E ", " F ", " G ", " H "])
 
 setup_board(board_player)
@@ -30,37 +27,6 @@ def print_board(board):
         print("".join(i))
 
 
-def position_ship_player(start_pos, finish_pos):
-    if (len(start_pos) > 2 or len(finish_pos) > 2):
-        print("Max 3 characters for each position")
-    else: 
-        if (letters_to_numbers.get(start_pos[0].upper(), "not found") == "not found" or 
-        letters_to_numbers.get(finish_pos[0].upper(), "not found") == "not found"):
-            print("One of the columns you are trying to select doesn't exist")
-        else: 
-            if (int(start_pos[1:]) > 8 or int(finish_pos[1:]) > 8):
-                print("You are selecting rows that doesn't exist")
-            else:
-                # START
-                letter_start = start_pos[0].upper()
-                number_start = start_pos[1:]
-                row_start = int("".join(number_start)) - 1
-                column_start = letters_to_numbers[letter_start] + 1
-
-                # FINISH
-                letter_finish = finish_pos[0].upper()
-                number_finish = finish_pos[1:]
-                row_finish = int("".join(number_finish)) - 1
-                column_finish = letters_to_numbers[letter_finish] + 1
-
-                if letter_start == letter_finish:
-                    for i in range(row_start, row_finish + 1, 1):
-                        board_player[i][column_start] = "|O|"
-                    
-                elif row_start == row_finish:
-                    for i in range(column_start, column_finish + 1, 1):
-                        board_player[row_start][i] = "|O|"
-
 def position_ship_computer(ship_size):
     row_start = random.randint(0, 7)
     column_start = random.randint(1, 8)
@@ -70,7 +36,7 @@ def position_ship_computer(ship_size):
         column_start = random.randint(1, 8)
         if row_start <= 7 - ship_size + 1 or column_start <= 8 - ship_size + 1:
             break
-    print(row_start, column_start)
+    
     if row_start <= 7 - ship_size + 1 and column_start <= 8 - ship_size + 1:
         direction = random.randint(0, 1)
         # COLUMN = 0 | ROW = 1
@@ -86,19 +52,14 @@ def position_ship_computer(ship_size):
     elif row_start > column_start:
         for i in range(column_start, column_start + ship_size, 1):
             board_computer_hidden[row_start][i] = "|O|"
+    
+    print(row_start, column_start)
 
-
-def player_shoots(position):
-    letter = position[0].upper()
-    number = position[1:]
-    row = int("".join(number)) - 1
-    column = letters_to_numbers[letter] + 1
-
-    if board_computer_hidden[row][column] == "|O|":
-        board_computer_hidden[row][column] = "|X|"
-        board_computer_displayed[row][column] = "|X|"
-    else:
-        board_computer_displayed[row][column] = "|-|"
+def setup_computer_board():
+    position_ship_computer(2)
+    position_ship_computer(3)
+    position_ship_computer(4)
+    position_ship_computer(5)
 
 def computer_shoots():
     row = random.randint(0, 7)
@@ -110,9 +71,41 @@ def computer_shoots():
 
     if board_player[row][column] == "|O|":
         board_player[row][column] = "|X|"
+    elif board_player[row][column] == "|X|":
+        board_player[row][column] = "|X|"
     else:
         board_player[row][column] = "|-|"
 
+def check_computer():
+    blocks_left_computer = 0
+    for square in board_computer_hidden:
+        for sub_square in square:
+            if sub_square == "|O|":
+                blocks_left_computer += 1
+    
+    return blocks_left_computer
+
+
+def position_ship_player(start_pos, finish_pos):
+    # START
+    letter_start = start_pos[0].upper()
+    number_start = start_pos[1:]
+    row_start = int("".join(number_start)) - 1
+    column_start = letters_to_numbers[letter_start] + 1
+
+    # FINISH
+    letter_finish = finish_pos[0].upper()
+    number_finish = finish_pos[1:]
+    row_finish = int("".join(number_finish)) - 1
+    column_finish = letters_to_numbers[letter_finish] + 1
+
+    if letter_start == letter_finish:
+        for i in range(row_start, row_finish + 1, 1):
+            board_player[i][column_start] = "|O|"
+        
+    elif row_start == row_finish:
+        for i in range(column_start, column_finish + 1, 1):
+            board_player[row_start][i] = "|O|"
 
 def setup_player_board():
     print("Let's start by setting your ships!")
@@ -129,39 +122,21 @@ def setup_player_board():
         print(str(length) + " block ship position -> " + starting_block + ":" + finishing_block)
         position_ship_player(str(starting_block), str(finishing_block))
 
-def setup_player_board_test():
-    print("Let's start by setting your ship!")
-    print("You have 1 ship of 2 blocks!")
-    print("In order to setup a ship you will need to pass the start block and the end block!")
-    print("Here is how the board will look like so you have an idea!")
-    print_board(board_player)
-        
-    
-    print("Let's set up the 2 block long ship, type to starting block!")
-    starting_block = input()
-    print("Great work, type the finishing block!")
-    finishing_block = input()
-    print("2 block ship position -> " + starting_block + ":" + finishing_block)
-    position_ship_player(str(starting_block), str(finishing_block))
+def player_shoots(position):
+    letter = position[0].upper()
+    number = position[1:]
+    row = int("".join(number)) - 1
+    column = letters_to_numbers[letter] + 1
 
-def setup_computer_board():
-    position_ship_computer(2)
-    position_ship_computer(3)
-    position_ship_computer(4)
-    position_ship_computer(5)
-
-def setup_computer_board_test():
-    position_ship_computer(2)
-
-
-def check_computer():
-    blocks_left_computer = 0
-    for square in board_computer_hidden:
-        for sub_square in square:
-            if sub_square == "|O|":
-                blocks_left_computer += 1
-    
-    return blocks_left_computer
+    if board_computer_hidden[row][column] == "|O|":
+        board_computer_hidden[row][column] = "|X|"
+        board_computer_displayed[row][column] = "|X|"
+    elif board_computer_hidden[row][column] == "|X|":
+        board_computer_hidden[row][column] = "|X|"
+        board_computer_displayed[row][column] = "|X|"
+    else:
+        board_computer_hidden[row][column] = "|-|"
+        board_computer_displayed[row][column] = "|-|"
 
 def check_player():
     blocks_left_player = 0
@@ -180,8 +155,8 @@ def run_game():
     if answer == "Y":
         print("Awesome")
 
-        setup_player_board_test()
-        setup_computer_board_test()
+        setup_player_board()
+        setup_computer_board()
 
         print_board(board_computer_displayed)
         print(" -  -  -  -  -  -  -  -  -")
@@ -190,7 +165,6 @@ def run_game():
         print("Let's start shooting!")
 
         while check_computer() != 0 or check_player() != 0:
-            print(check_computer(), check_player())
             print("Type where you want to shoot, for example: A1")
             square_to_be_shot = input()
             player_shoots(square_to_be_shot)
@@ -200,17 +174,20 @@ def run_game():
             print(" -  -  -  -  -  -  -  -  -")
             print_board(board_player)
 
-        if check_computer() == 0:
-            print("The computer has won!")
-            exit()
-        elif check_player() == 0:
-            print("You have won!")
-            exit()
+            if check_computer() == 0:
+                print("You have won!")
+                exit()
+                break
+            elif check_player() == 0:
+                print("The computer has won!")
+                exit()
+                break
 
     elif answer == "N":
         print("You are missing out!")
     else:
         print("Can't process that my friend!")
+
 
 run_game()
 
